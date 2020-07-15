@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Grpc.Core;
 
 namespace Volo.Controller
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Channel channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
+            var client = new DatapointService.DatapointServiceClient(channel);
+            var reply = client.AddDatapoint(new DatapointMessage() { Identifier = "test", Value = 20 });
         }
     }
 }
