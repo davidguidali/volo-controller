@@ -19,11 +19,16 @@ namespace Volo.Controller
             var timer = new Timer(1000);
             timer.Elapsed += async (sender, e) =>
             {
-                var res2 = await client.UpdateDatapointAsync(new DatapointMessage() { Identifier = "drizzt", Value = DateTime.Now.Millisecond }, new CallOptions().WithWaitForReady(true));
+                Random r = new Random();
+                int rInt = r.Next(1, 10000);
+
+                var res2 = await client.UpdateDatapointAsync(new DatapointMessage() { Identifier = "drizzt", Value = rInt }, new CallOptions().WithWaitForReady(true));
                 Console.WriteLine(res2);
             };
 
             timer.Start();
+
+            while (true) ;
         }
     }
 }

@@ -15,6 +15,4 @@ WORKDIR /app
 
 COPY --from=build /src/Volo.Controller/out ./
 
-EXPOSE 7718
-
 ENTRYPOINT ["dotnet", "Volo.Controller.dll"]
