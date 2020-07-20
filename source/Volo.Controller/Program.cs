@@ -1,13 +1,13 @@
 ﻿using System.Threading.Tasks;
 
-namespace Volo.Controller
+namespace Volo.Controller.Opcua
 {
     internal class Program
     {
         private static async Task Main(string[] args)
         {
             OpcuaController opcuaController = new OpcuaController();
-            await opcuaController.SeedRandom();
+            opcuaController.StartListening();
         }
     }
 }

@@ -3,6 +3,8 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
 COPY source/*.sln ./
 COPY source/Volo.Controller/*.csproj ./Volo.Controller/
+COPY source/Volo.Controller.Shared/*.csproj ./Volo.Controller.Shared/
+COPY source/Volo.Controller.Opcua/*.csproj ./Volo.Controller.Opcua/
 
 RUN dotnet restore
 COPY source/. .

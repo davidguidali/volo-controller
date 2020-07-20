@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Authors>davidguidali</Authors>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Volo.Controller.Opcua\Volo.Controller.Opcua.csproj" />
+    <PackageReference Include="MongoDB.Entities" Version="13.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Volo.Controller.Shared\Volo.Controller.Shared.csproj" />
   </ItemGroup>
 </Project>
