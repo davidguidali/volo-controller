@@ -7,7 +7,7 @@ namespace Volo.Controller.Opcua
         private static async Task Main(string[] args)
         {
             OpcuaController opcuaController = new OpcuaController();
-            opcuaController.StartListening();
+            await opcuaController.StartListening();
         }
     }
 }

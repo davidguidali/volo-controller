@@ -11,18 +11,27 @@ namespace Volo.Controller
 {
     public class OpcuaController
     {
-        public void StartListening()
+        public async Task StartListening()
         {
+            Console.WriteLine("Connecting to Server...");
             Channel channel = new Channel("volo-opcua-server:50051", ChannelCredentials.Insecure);
             var client = new DatapointService.DatapointServiceClient(channel);
+            Console.WriteLine("Connected!");
 
+            Console.WriteLine("Connecting to DB...");
             var db = new DB("opcuadata", host: "mongodb", port: 27017);
+            Console.WriteLine("Connected!");
+
+            Datapoint dp = new Datapoint() { Identifier = "choco", Value = 50 };
+            dp.Save();
 
             Timer timer = new Timer(5000);
 
             async void OnTimerElapsed(object sender, ElapsedEventArgs e)
             {
                 var datapoints = db.Queryable<Datapoint>().ToList();
+
+                Console.WriteLine($"Number of datapoints: {datapoints.Count}");
 
                 foreach (var datapoint in datapoints)
                 {
@@ -35,7 +44,7 @@ namespace Volo.Controller
 
             timer.Start();
 
-            while (true) ;
+            while (true) { await Task.Delay(1000); };
         }
     }
 }
