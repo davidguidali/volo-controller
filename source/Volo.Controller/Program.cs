@@ -18,7 +18,8 @@ namespace Volo.Controller.Opcua
                     description: "The path to the settings file")
             };
 
-            rootCommand.Description = "Creates the OPCUA controller for the volo project";
+            rootCommand.Description = "Creates the OPCUA controller" +
+                " for the volo project";
             rootCommand.Handler = CommandHandler.Create<string>(Initialize);
             await rootCommand.InvokeAsync(args);
         }
