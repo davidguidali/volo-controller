@@ -7,6 +7,9 @@ namespace Volo.Controller.Shared
         [JsonProperty("grpcPort")]
         public int GrpcPort { get; set; }
 
+        [JsonProperty("grpcHost")]
+        public string GrpcHost { get; set; }
+
         [JsonProperty("grpcPortOpcuaServer")]
         public int GrpcPortOpcuaServer { get; set; }
 

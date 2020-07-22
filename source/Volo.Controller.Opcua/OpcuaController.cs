@@ -42,6 +42,8 @@ namespace Volo.Controller
                 await _client.SetDatapointAsync(new DatapointMessage() { Identifier = datapoint.Identifier, Value = datapoint.Value }, new CallOptions().WithWaitForReady(true));
             }
 
+            StartGrpcServer();
+
             while (true) { await Task.Delay(1000); };
         }
 
@@ -56,20 +58,36 @@ namespace Volo.Controller
 
         private async Task AddDefaultDatapoint()
         {
-            Datapoint defaultDatapoint = new Datapoint()
+            Datapoint datapoint = new Datapoint()
             {
                 Identifier = "hello.world",
                 Value = 100
             };
 
-            var datapoint = _database.Find<Datapoint>().Many(f => f.Identifier.Equals("hello.world"));
+            await SetDatapoint(datapoint);
+        }
 
-            if (datapoint.Count == 0)
+        private void StartGrpcServer()
+        {
+            var grpcServer = new Server
             {
-                await defaultDatapoint.SaveAsync();
+                Services = { OpcuaControllerService.BindService(new OpcuaControllerApi(this)) },
+                Ports = { new ServerPort(_settings.GrpcHost, _settings.GrpcPort, ServerCredentials.Insecure) }
+            };
+
+            grpcServer.Start();
+        }
+
+        public async Task SetDatapoint(Datapoint datapoint)
+        {
+            var datapointsInDatabase = await _database.Find<Datapoint>().ManyAsync(f => f.Identifier.Equals(datapoint.Identifier));
+
+            if (datapointsInDatabase.Count == 0)
+            {
+                await datapoint.SaveAsync();
             }
 
-            await _client.SetDatapointAsync(new DatapointMessage() { Identifier = defaultDatapoint.Identifier, Value = defaultDatapoint.Value }, new CallOptions().WithWaitForReady(true));
+            var result = await _client.SetDatapointAsync(new DatapointMessage() { Identifier = datapoint.Identifier, Value = datapoint.Value }, new CallOptions().WithWaitForReady(true));
         }
     }
 }
