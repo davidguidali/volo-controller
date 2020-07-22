@@ -6,45 +6,70 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Volo.Controller.Opcua;
+using Volo.Controller.Shared;
 
 namespace Volo.Controller
 {
     public class OpcuaController
     {
-        public async Task StartListening()
+        private readonly AppSettings _settings;
+        private DB _database;
+        private OpcuaServerService.OpcuaServerServiceClient _client;
+
+        public OpcuaController(AppSettings settings)
         {
-            Console.WriteLine("Connecting to Server...");
-            Channel channel = new Channel("volo-opcua-server:50051", ChannelCredentials.Insecure);
-            var client = new DatapointService.DatapointServiceClient(channel);
+            _settings = settings;
+        }
+
+        public async Task Start()
+        {
+            var channel = CreateChannel();
+            _client = new OpcuaServerService.OpcuaServerServiceClient(channel);
+
+            Console.WriteLine($"Connecting to {_settings.MongoDbHost}:{_settings.MongoDbPort}");
+            _database = new DB("opcuadata", host: _settings.MongoDbHost, port: _settings.MongoDbPort);
             Console.WriteLine("Connected!");
 
-            Console.WriteLine("Connecting to DB...");
-            var db = new DB("opcuadata", host: "mongodb", port: 27017);
-            Console.WriteLine("Connected!");
+            await AddDefaultDatapoint();
 
-            Datapoint dp = new Datapoint() { Identifier = "choco", Value = 50 };
-            dp.Save();
+            var datapoints = _database.Queryable<Datapoint>().ToList();
 
-            Timer timer = new Timer(5000);
+            Console.WriteLine($"Number of datapoints: {datapoints.Count}");
 
-            async void OnTimerElapsed(object sender, ElapsedEventArgs e)
+            foreach (var datapoint in datapoints)
             {
-                var datapoints = db.Queryable<Datapoint>().ToList();
-
-                Console.WriteLine($"Number of datapoints: {datapoints.Count}");
-
-                foreach (var datapoint in datapoints)
-                {
-                    var reply = await client.SetDatapointAsync(new DatapointMessage() { Identifier = datapoint.Identifier, Value = datapoint.Value }, new CallOptions().WithWaitForReady(true));
-                    Console.WriteLine($"id: {datapoint.Identifier}, value:{datapoint.Value}, message:{reply.Message}");
-                }
+                Console.WriteLine($"Set Datapoint: {datapoint.Identifier}:{datapoint.Value}");
+                await _client.SetDatapointAsync(new DatapointMessage() { Identifier = datapoint.Identifier, Value = datapoint.Value }, new CallOptions().WithWaitForReady(true));
             }
 
-            timer.Elapsed += OnTimerElapsed;
-
-            timer.Start();
-
             while (true) { await Task.Delay(1000); };
+        }
+
+        private Channel CreateChannel()
+        {
+            Console.WriteLine($"Create channel to {_settings.DomainNameOpcuaServer}:{_settings.GrpcPortOpcuaServer}");
+            Channel channel = new Channel($"{_settings.DomainNameOpcuaServer}:{_settings.GrpcPortOpcuaServer}", ChannelCredentials.Insecure);
+            Console.WriteLine("Connected!");
+
+            return channel;
+        }
+
+        private async Task AddDefaultDatapoint()
+        {
+            Datapoint defaultDatapoint = new Datapoint()
+            {
+                Identifier = "hello.world",
+                Value = 100
+            };
+
+            var datapoint = _database.Find<Datapoint>().Many(f => f.Identifier.Equals("hello.world"));
+
+            if (datapoint.Count == 0)
+            {
+                await defaultDatapoint.SaveAsync();
+            }
+
+            await _client.SetDatapointAsync(new DatapointMessage() { Identifier = defaultDatapoint.Identifier, Value = defaultDatapoint.Value }, new CallOptions().WithWaitForReady(true));
         }
     }
 }

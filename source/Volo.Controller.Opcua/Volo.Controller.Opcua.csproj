@@ -1,14 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Protos\OpcuaControllerApi.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.30.0" />
+    <PackageReference Include="Grpc.Core" Version="2.30.0" />
     <PackageReference Include="MongoDB.Entities" Version="13.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Volo.Controller.Shared\Volo.Controller.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Protos\OpcuaServerApi.proto">
+      <GrpcServices>Client</GrpcServices>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Protos\OpcuaControllerApi.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\OpcuaServerApi.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

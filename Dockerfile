@@ -17,4 +17,4 @@ WORKDIR /app
 
 COPY --from=build /src/Volo.Controller/out ./
 
-ENTRYPOINT ["dotnet", "Volo.Controller.dll"]
+ENTRYPOINT ["dotnet", "Volo.Controller.dll", "--settings", "Config/appsettings.json"]

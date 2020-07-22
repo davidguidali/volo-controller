@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20303.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Volo.Controller.Opcua\Volo.Controller.Opcua.csproj" />
     <ProjectReference Include="..\Volo.Controller.Shared\Volo.Controller.Shared.csproj" />
   </ItemGroup>

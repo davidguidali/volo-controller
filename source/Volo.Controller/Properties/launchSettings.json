@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Volo.Controller": {
+      "commandName": "Project",
+      "commandLineArgs": "--settings Config/appsettings.json"
+    }
+  }
+}
